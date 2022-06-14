@@ -19,7 +19,6 @@ import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
-import org.antlr.v4.test.runtime.BaseRuntimeTestSupport;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
@@ -38,7 +37,7 @@ import static junit.framework.TestCase.*;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 
-public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTestSupport {
+public class BaseRustTest implements RuntimeTestSupport {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -111,11 +110,6 @@ public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTest
 	 */
 	protected StringBuilder antlrToolErrors;
 
-
-	public String getPropertyPrefix() {
-		return "antlr-rust";
-	}
-
 	@Override
 	public void testSetUp() throws Exception {
 //		STGroup.verbose = true;
@@ -141,6 +135,16 @@ public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTest
 
 	@Override
 	public void testTearDown() throws Exception {
+	}
+
+	@Override
+	public String getTmpDir() {
+		return srcdir;
+	}
+
+	@Override
+	public String getStdout() {
+		return null;
 	}
 
 	@Override
@@ -179,7 +183,7 @@ public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTest
 
 		ATN atn = g.atn;
 		if (useSerializer) {
-			char[] serialized = ATNSerializer.getSerialized(atn).toCharArray();
+			char[] serialized = ATNSerializer.getSerializedAsChars(atn);
 			return new ATNDeserializer().deserialize(serialized);
 		}
 
@@ -413,7 +417,7 @@ public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTest
 													boolean defaultListener,
 													String... extraOptions) {
 		ErrorQueue equeue =
-				BaseRuntimeTest.antlrOnString(getTempDirPath(), "Rust", grammarFileName, grammarStr, defaultListener, extraOptions);
+				BaseRuntimeTest.antlrOnString(getTmpDir(), "Rust", grammarFileName, grammarStr, defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			System.out.println(equeue.errors);
 			return false;
@@ -532,7 +536,7 @@ public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTest
 			AnalysisPipeline anal = new AnalysisPipeline(g);
 			anal.process();
 
-			CodeGenerator gen = CodeGenerator.create(g);
+			CodeGenerator gen = new CodeGenerator(g);
 			ST outputFileST = gen.generateParser(false);
 			String output = outputFileST.render();
 			//System.out.println(output);
