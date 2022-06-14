@@ -765,7 +765,7 @@ testShiftInRange(shiftAmount) ::= <<
 
 // produces smaller bytecode only when bits.ttypes contains more than two items
 bitsetBitfieldComparison(s, bits) ::= <%
-(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1usize \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1usize \<\< <offsetShift(ttype, bits.shift)>)}; separator=" | ">)) != 0)
+(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1u64 \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1u64 \<\< <offsetShift(ttype, bits.shift)>)}; separator=" | ">)) != 0)
 %>
 
 isZero ::= [
