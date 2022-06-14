@@ -19,8 +19,8 @@ import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
-import org.antlr.v4.test.runtime.BaseRuntimeTestSupport;
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
 import org.antlr.v4.tool.*;
@@ -38,7 +38,7 @@ import static junit.framework.TestCase.*;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 
-public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTestSupport {
+public class BaseRustTest implements RuntimeTestSupport {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -144,6 +144,14 @@ public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTest
 	}
 
 	@Override
+	public void beforeTest(RuntimeTestDescriptor descriptor) {
+	}
+
+	@Override
+	public void afterTest(RuntimeTestDescriptor descriptor) {
+	}
+
+	@Override
 	public String getParseErrors() {
 		return stderrDuringParse;
 	}
@@ -154,6 +162,27 @@ public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTest
 			return null;
 		}
 		return antlrToolErrors.toString();
+	}
+
+
+	@Override
+	public File getTempParserDir() {
+		return new File(getTempParserDirPath());
+	}
+
+	@Override
+	public String getTempParserDirPath() {
+		return srcdir;
+	}
+
+	@Override
+	public final File getTempTestDir() {
+		return new File(getTempDirPath());
+	}
+
+	@Override
+	public final String getTempDirPath() {
+		return srcdir;
 	}
 
 	protected Tool newTool(String[] args) {
@@ -413,7 +442,7 @@ public class BaseRustTest extends BaseRuntimeTestSupport  implements RuntimeTest
 													boolean defaultListener,
 													String... extraOptions) {
 		ErrorQueue equeue =
-				BaseRuntimeTest.antlrOnString(getTempDirPath(), "Rust", grammarFileName, grammarStr, defaultListener, extraOptions);
+				BaseRuntimeTest.antlrOnString(srcdir, "Rust", grammarFileName, grammarStr, defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			System.out.println(equeue.errors);
 			return false;
